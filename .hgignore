@@ -1,0 +1,5 @@
+glob:moc_*
+glob:release/*
+glob:Makefile*
+glob:*.o
+glob:ui_*.h
