@@ -16,3 +16,5 @@ HEADERS  += allseeingeye.h
 FORMS    += allseeingeye.ui
 
 RC_FILE = allseeingeye.rc
+
+ICON = icons/allseeingeye.icns

@@ -3,3 +3,8 @@ glob:release/*
 glob:Makefile*
 glob:*.o
 glob:ui_*.h
+glob:build/*
+glob:AllSeeingEye.app/*
+glob:AllSeeingEye.xcodeproj/*
+Info.plist
+AllSeeingEye.dmg
