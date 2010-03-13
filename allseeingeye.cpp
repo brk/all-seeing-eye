@@ -15,9 +15,8 @@
 #include "allseeingeye.h"
 #include "ui_allseeingeye.h"
 
+#include <QFile>
 #include <QFileDialog>
-#include <QFileInfo>
-#include <QDir>
 #include <QImage>
 #include <QByteArray>
 #include <QTextStream>
@@ -30,6 +29,8 @@ AllSeeingEye::AllSeeingEye(QWidget *parent) :
     ui(new Ui::AllSeeingEye)
 {
     ui->setupUi(this);
+
+    connect(&watcher, SIGNAL(watchedFileChanged()), this, SLOT(watchedFileChanged()));
 }
 
 AllSeeingEye::~AllSeeingEye() {
@@ -58,33 +59,15 @@ void AllSeeingEye::on_pushButton_clicked()
                                                 "All Files (*)",
                                                 NULL,
                                                 options);
-    this->setWatchedPath(path);
+    setWatchedPath(path);
 }
 
 void AllSeeingEye::setWatchedPath(QString path) {
-    if (path.isEmpty()) { return; }
-
-    if (!this->filepath.isEmpty()) {
-        this->fswatcher.removePath(filepath);
-    } else {
-        connect(&fswatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileChanged(QString)));
-    }
-
-    this->filepath = path;
-    fswatcher.addPath(filepath);
-
-    QMainWindow::setWindowTitle("AllSeeingEye watching " + filepath);
-
-    fileChanged(filepath);
+    watcher.setWatchedPath(path);
+    QMainWindow::setWindowTitle("AllSeeingEye watching " + path);
 }
 
-void AllSeeingEye::fileChanged(const QString& path) {
-    // The file system watcher seems to randomly drop paths
-    // after one or two fileChanged events. Oh well.
-    if (fswatcher.files().isEmpty()) {
-        fswatcher.addPath(path);
-    }
-
+void AllSeeingEye::watchedFileChanged() {
     // We update after a short delay because, on Win32 with large files,
     // we can sometimes get a fileChanged event before the app that modified
     // the file we're interested in has a chance to close the file. Thus,
@@ -93,7 +76,7 @@ void AllSeeingEye::fileChanged(const QString& path) {
 }
 
 void AllSeeingEye::updateViewWithContents() {
-    QImage img(filepath);
+    QImage img(watcher.getWatchedPath());
     bool isValidImage = img.valid(QPoint(0,0));
 
     if (isValidImage) {
@@ -101,9 +84,12 @@ void AllSeeingEye::updateViewWithContents() {
         ui->imageLabel->setPixmap(QPixmap::fromImage(img));
     } else {
         ui->tabWidget->setCurrentIndex(0);
-        QFile file(this->filepath);
+        QFile file(watcher.getWatchedPath());
 
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (!file.exists()) {
+            ui->plainTextEdit->setPlainText("");
+            return;
+        } else if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             ui->plainTextEdit->setPlainText("Error! File not readable!");
             return;
         }

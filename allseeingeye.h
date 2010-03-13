@@ -20,6 +20,8 @@
 #include <QImage>
 #include <QTimer>
 
+#include "persistentfilesystemwatcher.h"
+
 namespace Ui {
     class AllSeeingEye;
 }
@@ -37,12 +39,11 @@ protected:
 
 private:
     Ui::AllSeeingEye *ui;
-    QString filepath;
-    QFileSystemWatcher fswatcher;
+    PersistentFileSystemWatcher watcher;
 
 private slots:
     void on_pushButton_clicked();
-    void fileChanged(const QString& path);
+    void watchedFileChanged();
     void updateViewWithContents();
 };
 
