@@ -9,7 +9,9 @@ Example usage scenarios:
 
 ### Running ###
 
-If you provide a file path as the first argument to AllSeeingEye on the command line, AllSeeingEye will immediately begin watching the file at startup. If you do not provide a file path, you may select a file to watch at any time with the "Watch File" button at the bottom of the window:
+If you provide a file path as the first argument to AllSeeingEye on the command line, AllSeeingEye will immediately begin watching the file at startup. If you do not provide a file path, you may select a file to watch at any time with the "Watch File" button at the bottom of the window.
+
+AllSeeingEye will automatically switch between the Text Watcher and Image Watcher tabs depending on the (initial) contents of the file being watched.
 
 ### Compiling ###
 
